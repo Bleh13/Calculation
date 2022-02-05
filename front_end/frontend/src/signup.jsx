@@ -44,7 +44,7 @@ import Paper from '@mui/material/Paper'
   }
          return (
              <div>
-              <h1>bleh</h1>
+    
                  {/* <form class="container text-primary bg-light position-absolute top-50 start-50 translate-middle" onSubmit={Register} >
    <div class="mb-3 ">
     
