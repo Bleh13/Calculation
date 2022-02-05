@@ -27,7 +27,7 @@ export default function Updateprofile() {
   async function onsubmitForm(e) {
     
     e.preventDefault();
-await Update(id[0].email,emailid,name,phonenumber);
+await Update(id[0].email,id[0]._id,emailid,name,phonenumber);
 
   
 
@@ -37,9 +37,9 @@ await Update(id[0].email,emailid,name,phonenumber);
 
     <div>
   
-       <h1>{id[0].name}</h1>
+      {/* <h1>{id[0].name}</h1>
       <h1>{id[0].phonenuber}</h1>
-      <h1>{id[0].email}</h1> 
+      <h1>{id[0].email}</h1>   */}
     
       <form class="container text-primary bg-light position-absolute top-50 start-50 translate-middle" onSubmit={onsubmitForm}>
         <div class="mb-3">

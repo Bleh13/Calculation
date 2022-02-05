@@ -96,15 +96,17 @@ signInWithPopup(auth, provider)
       return signOut(auth);
           }
 
-          function Update(currentemailid,newemail,name,phonenumber){
+          function Update(currentemailid,id,newemail,name,phonenumber){
             const registered = {
+              id:id,
  currentemail:currentemailid,
               name: name,
               phonenumber: phonenumber,
               newemail: newemail
             }
-            console.log(currentemailid);
-            axios.put(`http://localhost:5001/users/update/${currentemailid}`,registered).then(res => (console.log(res.data)))
+            console.log(id);
+            axios.put(`http://localhost:5001/users/update/${id}`,registered).then(res => (setUser(res.data)
+            ))
          
          return registered; }
 

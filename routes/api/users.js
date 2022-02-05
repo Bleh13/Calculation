@@ -82,13 +82,12 @@ router.get('/usersupdate',(req,res)=>{
     })})
 router.put('/update/(:id)', (req, res) => {
     console.log(req)
-    userprofiles.findOneAndUpdate(req.body.currentemailid).then(user => {
+    userprofiles.findByIdAndUpdate(req.body.id).then(user => {
         user.name = req.body.name,
             user.email = req.body.newemail
             user.phonenumber=req.body.phonenumber
-        user.save().then(user => res.json({ msg: user.name + 'data updated' }))
+        user.save().then(user => res.json({ user }))
+    }) 
 
-    })
-})
-       
+})       
 module.exports = router;
