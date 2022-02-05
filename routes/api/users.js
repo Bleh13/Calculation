@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router();
 const mongoose = require('mongoose')
 const gravatar = require('gravatar')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 var userprofiles = require('../../schema models/userSchema');
 
 

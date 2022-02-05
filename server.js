@@ -3,7 +3,6 @@ const mongoose= require('mongoose')
 const users= require('./routes/api/users')
 const items= require('./routes/api/items')
 const profile = require('./routes/api/items')
-const passport=require('passport')
 const cors=require('cors')
 
 

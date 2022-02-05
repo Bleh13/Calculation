@@ -2,8 +2,8 @@ const express = require('express')
 const router = express.Router();
 const mongoose = require('mongoose')
 const gravatar = require('gravatar')
-const bcrypt = require('bcrypt')
-var Items = require('../../schema models/ItemsSchema')
+const bcrypt = require('bcryptjs')
+var Items = require('../../schema models/itemsSchema')
 
 router.get('/useremail',(req, res) => {
     Items.findOne()
