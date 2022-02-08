@@ -36,8 +36,8 @@ await Update(id[0].email,id[0]._id,emailid,name,phonenumber);
   return (
 
     <div>
-  
-      {/* <h1>{id[0].name}</h1>
+{/*   
+      <h1>{id[0].name}</h1>
       <h1>{id[0].phonenuber}</h1>
       <h1>{id[0].email}</h1>   */}
     

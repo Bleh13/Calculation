@@ -96,7 +96,7 @@ import Paper from '@mui/material/Paper'
   <Grid item xs={6}>
     <FormControl variant="standard"  required="true">
   <InputLabel htmlFor="component-simple">Password</InputLabel>
-  <Input id="password" value={registerpassword} onChange={(e)=>{setpassword(e.target.value)}} />
+  <Input type='password' id="password" value={registerpassword} onChange={(e)=>{setpassword(e.target.value)}} />
 </FormControl>
   </Grid>
   <Grid item xs={6}>

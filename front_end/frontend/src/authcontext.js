@@ -1,10 +1,11 @@
-import {  GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword ,signOut} from 'firebase/auth'
+import {  GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword ,updateEmail,signOut,updateProfile} from 'firebase/auth'
 import { auth } from './firebaseconfig';
 import { useState, useEffect, useContext, createContext } from 'react'
 import axios from 'axios'
 
 
 const provider = new GoogleAuthProvider();
+const user = auth.currentUser;
 
 export const AuthContext = createContext()
 
@@ -96,7 +97,8 @@ signInWithPopup(auth, provider)
       return signOut(auth);
           }
 
-          function Update(currentemailid,id,newemail,name,phonenumber){
+   async  function Update(currentemailid,id,newemail,name,phonenumber){
+    await updateEmail(user, "user@example.com")
             const registered = {
               id:id,
  currentemail:currentemailid,
@@ -105,10 +107,15 @@ signInWithPopup(auth, provider)
               newemail: newemail
             }
             console.log(id);
-            axios.put(`http://localhost:5001/users/update/${id}`,registered).then(res => (setUser(res.data)
-            ))
-         
-         return registered; }
+            // await updateProfile(USER, {
+            //   displayName: name,
+            //   email:newemail}).then(success=>{ console.log ( success)}).catch(err=>console.log(err))
+            await axios.put(`http://localhost:5001/users/update/${id}`,registered).then(res => {
+              
+             console.log(res.data)
+            })
+              
+          }
 
    useEffect(() => {
     
@@ -120,7 +127,7 @@ signInWithPopup(auth, provider)
     })
     console.log(User)
   }
- ) 
+ ,[Googlesignup,LoginWithGoogle,CreateUser,Logout,Update]) 
 
   const complete={
     User ,Googlesignup,LoginWithGoogle,CreateUser,Logout,Update

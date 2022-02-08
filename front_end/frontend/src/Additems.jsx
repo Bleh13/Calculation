@@ -69,10 +69,10 @@ axios.post('http://localhost:5001/items/newItem',inventory)
   
   return <div>
       
-     <Box sx={{display:'flex',bgcolor:'black'}}>
-     <Box component="form" sx={{bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,boxShadow: 10,display:'grid',
+     <Box sx={{display:'flex',bgcolor:'black',mt:5}}>
+     <Box component="form" sx={{display:'flex',bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,boxShadow: 10,display:'grid',
         alignItems: 'center',borderColor: 'primary.main'}}>   
-       <InputLabel sx={{ ml:25, fontSize:20}}>Add inventory</InputLabel> 
+       <InputLabel sx={{  textAlign:'center',fontSize:20}}>Add inventory</InputLabel> 
 
      <InputLabel sx={{ }}>Product Description</InputLabel> 
      <Input sx={{  }} type="string" onChange={e=>{
@@ -112,10 +112,10 @@ axios.post('http://localhost:5001/items/newItem',inventory)
  </Box> 
 
 
- <Box component='summary' sx={{bgcolor:'cornsilk', width:1/2, p:2,boxShadow: 10,display:'grid',
-        alignItems: 'center', borderRadius:30,borderColor: 'secondary.main'}}>
-           <InputLabel sx={{ ml:35, fontSize:20}}>Summarry</InputLabel> 
-      <List sx={{mx:25,textAlign:'center'}}>
+ <Box component="form" sx={{display:'flex',bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,boxShadow: 10,display:'grid',
+        alignItems: 'center',borderColor: 'primary.main'}}>   
+       <InputLabel sx={{  textAlign:'center',fontSize:20}}>summary</InputLabel> 
+      <List sx={{textAlign:'center'}}>
         <ListItem >
         <ListItemText inset={true} sx={{fontSize:50}} primary='PRODUCT DESCRIPTION' secondary={description}/>
         </ListItem>
@@ -143,10 +143,11 @@ axios.post('http://localhost:5001/items/newItem',inventory)
         <ListItem>
         <ListItemText inset={true} primary='date and time' secondary={datevalue} />
         </ListItem>
-      </List>
- <Button sx={{mx:25}}variant="contained"  onClick={createInventory} >
+        <Button sx={{}}variant="contained"  onClick={createInventory} >
   Create inventory
 </Button>
+      </List>
+
  </Box>
  </Box>
  </div>
