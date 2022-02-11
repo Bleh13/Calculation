@@ -4,8 +4,8 @@ var schema= mongoose.Schema;
 var Items= new schema(
     {
         
-        ProductType:{type:String },
-        ProductDescription:{type:String},
+        ProductType:{type:String , index:true},
+        ProductDescription:{type:String,index:true},
         Price:{type:Number},
         Quantity:{type:Number},
         Value: {type:Number},
@@ -14,5 +14,6 @@ var Items= new schema(
         Email:{type:String,required:true}
     }
 )
+Items.index({ProductDescription:'text', ProductType:'text'})
 var items =mongoose.model('items',Items)
 module.exports=items;

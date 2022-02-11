@@ -19,22 +19,28 @@ import SearchIcon from '@mui/icons-material/Search';
 import { getTableSortLabelUtilityClass } from '@mui/material';
 
 export default function ViewInventory() {
+  const Producttype= [{id:1,value:'vegie'},{id:2,value:'fruit'},{id:3,value:'addanother type'} ]
+  const [x, setx] = useState([]);
+  const { User } = useAuthState();
+  const Searchvalue={
+    email:User.email,
+    Value:undefined
+  }
+  const [searchresults, setsearchresults] = useState([])
  const [data, setdata] = useState(true);
  const [filtervalue,setfiltervalue] =useState({
-  ProductDescription:" " ,
-Producttype:"",
-quantity :"",
-Discount:0,
-Priceperunit:0
+   email:User.email,
+  ProductDescription:undefined,
+Producttype:undefined,
+quantity :undefined,
+Discount:undefined,
+Priceperunit:undefined
  })
- const Producttype= [{id:1,value:'vegie'},{id:2,value:'fruit'},{id:2,value:'addanother type'} ]
- const [x, setx] = useState([]);
- const { User } = useAuthState();
- var y=User.email
+
 
 
 useEffect(() => {
-  axios.get('http://localhost:5001/items/',{params:{email:y}})
+  axios.get('http://localhost:5001/items/',{params:{email:filtervalue.email}})
   .then(res=>{
     if(!res.data.length){
     setdata(false)}
@@ -47,20 +53,33 @@ useEffect(() => {
   
   }
 , []);  
-function handleFilter(e){
+async function handleFilter(e){
 const{name,value}=e.target;
 setfiltervalue(previousstate=>({
   ...previousstate,
 [name]:value
-}))
+}
+)
+
+)
+console.log(filtervalue)
 }
 function HandleFilterSubmit(e){
 e.preventDefault();
-x.filter()
+axios.get('http://localhost:5001/items/filter',{params:{body:filtervalue}}).then(res=>{
+  setx(res.data)
+})
+}
+
+async function handleSearch(e){
+  e.preventDefault();
+await axios.get(`http://localhost:5001/items/search`,{params:{toJSON: () =>Searchvalue}}).then(res=>{
+  setsearchresults(res.data)
+  console.log(searchresults)
+})
 }
 return(
   <div>
-    {console.log(x)}
     <Accordion square={false} >
   <AccordionSummary   expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
@@ -68,11 +87,11 @@ return(
           <AccordionDetails sx={{display:'table'}}>
           <InputLabel sx={{textAlign:'center' }}>Product Description</InputLabel> 
      <Input name="ProductDescription" value={filtervalue.ProductDescription} type="string"
-      onChange={handleFilter()}
+      onDoubleClick={e=>handleFilter(e)}
       multiline  />    
       <br></br>
   <TextField 
-  // onChange={e=>{settype(e.target.value)}} 
+  onChange={e=>{setfiltervalue({ProductType:[e.target.value]})}} 
   select  label="type of product"    color='' variant='filled' focused fullWidth  multiline>
 {Producttype.map(option=>(
   <MenuItem key={option.id} value={option.value}>
@@ -81,38 +100,38 @@ return(
 ))}
   </TextField>
  <InputLabel >quantity</InputLabel>   
- <Input type="number" name="ProductDescription" value={filtervalue.quantity} 
-      onChange={handleFilter()}  
+ <Input type="number" name="quantity" value={filtervalue.quantity} 
+      onChange={e=>handleFilter(e)}  
 //  onChange={e=>setQuantity(e.target.value)}
   />     
  <br></br>
  <InputLabel >Discount</InputLabel>   
- <Input type="number"  name="ProductDescription" value={filtervalue.Discount} 
-      onChange={handleFilter()}
+ <Input type="number"  name="Discount" value={filtervalue.Discount} 
+      onChange={e=>handleFilter(e)}
 //  onChange={e=>{
 //    setDiscount(e.target.value)}} 
    />    
     <br></br>
  <InputLabel >Price per unit</InputLabel>   
- <Input type="number" name="ProductDescription" value={filtervalue.Priceperunit} 
-      onChange={handleFilter()}
+ <Input type="number" name="Priceperunit" value={filtervalue.Priceperunit} 
+      onChange={e=>handleFilter(e)}
   // onChange={calculate} 
   />
   <br></br>
   <br></br>
-  <Button variant="contained" onSubmit={HandleFilterSubmit()}   >
+  <Button variant="contained" onClick={e=> HandleFilterSubmit()}   >
   Filter
 </Button>
           </AccordionDetails >
           </Accordion>
-  <Input sx={{ ml:50 }} placeholder="search" type="string"  multiline >
+  <Input sx={{ ml:50 }} placeholder="search" type="string"  multiline  onDoubleClick={e=>{console.log(e.target.value);Searchvalue.Value=e.target.value}}>
    </Input>
    <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-  <SearchIcon />
+  <SearchIcon onClick={e=>{ handleSearch(e)}}  />
 </IconButton>
  
     {data? 
-    x.map(({Date,ProductDescription,ProductType,Price,Value,Discount})=>{
+    x.map(({Date,ProductDescription,Quantity,ProductType,Price,Value,Discount})=>{
       return(
       <div>
          <Box sx={{display:'flow',mx:20,mt:1,bgcolor:'darkgray',p:1}}> 
@@ -123,6 +142,7 @@ return(
           <AccordionDetails>
           Product Description:{ProductDescription}<br></br><Divider/>
            Product Type:{ProductType}<br></br><Divider/>
+           Quantity:{Quantity}<br></br><Divider/>
           Product Price:{Price}<br></br><Divider/>
           Discount:{Discount}<br></br><Divider/>
          Value:{Value}<br></br><Divider/>

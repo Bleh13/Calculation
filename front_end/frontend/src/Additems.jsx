@@ -17,7 +17,7 @@ import axios from 'axios';
 import { useAuthState } from './authcontext';
 
 export default function Additems() {
-    const Producttype= [{id:1,value:'vegie'},{id:2,value:'fruit'},{id:2,value:'addanother type'} ]
+    const Producttype= [{id:1,value:'vegie'},{id:2,value:'fruit'},{id:3,value:'addanother type'} ]
     const [datevalue, setdate] = React.useState();
     const [description, setDescription] = React.useState();
     const [type, settype] = React.useState();

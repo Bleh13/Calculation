@@ -5,19 +5,40 @@ const gravatar = require('gravatar')
 const bcrypt = require('bcryptjs')
 var Items = require('../../schema models/itemsSchema')
 
+
 router.get('/useremail',(req, res) => {
     Items.findOne()
     .then(Items => res.json(Items))
 })
 
 router.get('/', (req, res,) => {
+    console.log(req)
     Items.find({Email: req.query.email},(error,docs)=>{
-        console.log(docs)
+        
         res.json(docs)
     })})
-    
-router.post('/newItem', (req, res) => {
 
+router.get('/filter', (req, res) => {
+    var data ={
+        ProductType:undefined,
+        ProductDescription:undefined,
+        Price:undefined,
+        Quantity: undefined,
+        Discount:undefined
+    }
+
+
+    console.log(req)
+})
+router.get('/search',(req,res)=>{
+    console.log(req.query)
+    var searchvalue= req.query.body.Searchvalue.Value
+    Items.find({Email: req.query.body.Searchvalue.email}).find({$text:{$search:searchvalue}})
+    .then(docs=>{
+        console.log(docs)
+        res.json(docs)})
+})   
+router.post('/newItem', (req, res) => {
     const newItem = new Items({
         ProductType:req.body.ProductType,
         ProductDescription:req.body.ProductDescription,
@@ -29,8 +50,6 @@ router.post('/newItem', (req, res) => {
         Email:req.body.Email
     }) 
      newItem.save().then(Item => {res.json(Item) }).catch(err => (console.log(err)))
-
-
     }
     )
 router.get('/delete/(:id)', (req, res) => {
