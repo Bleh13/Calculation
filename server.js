@@ -8,7 +8,7 @@ const cors=require('cors')
 
 const app=express();
 const db= `mongodb+srv://bleh:fKQ4GxRgN7n5dRU6@cluster0.uforu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-mongoose.connect(db,{ autoIndex: false }).then(()=>console.log('db connected')).catch(err=>console.log(err))
+mongoose.connect(db).then(()=>console.log('db connected')).catch(err=>console.log(err))
 
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())

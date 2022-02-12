@@ -30,10 +30,13 @@ router.get('/filter', (req, res) => {
 
     console.log(req)
 })
-router.get('/search',(req,res)=>{
-    console.log(req.query)
-    var searchvalue= req.query.body.Searchvalue.Value
-    Items.find({Email: req.query.body.Searchvalue.email}).find({$text:{$search:searchvalue}})
+router.post('/search',(req,res)=>{
+    console.log(req.body)
+    var searchvalue= req.body.Value
+    Items.find({Email: req.body.email}).find({$or:[
+      {ProductDescription:{$regex:searchvalue,$options: 'i'}},
+      {ProductType:{$regex:searchvalue,$options: 'i'}} 
+    ]})
     .then(docs=>{
         console.log(docs)
         res.json(docs)})
