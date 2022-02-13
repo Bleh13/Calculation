@@ -14,13 +14,13 @@ import Divider from '@mui/material/Divider';
 import { useAuthState } from './authcontext'
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
-import MenuIcon from '@mui/icons-material/Menu';
+import Grid from '@mui/material/Grid';
 import SearchIcon from '@mui/icons-material/Search';
-import { getTableSortLabelUtilityClass } from '@mui/material';
+
 
 export default function ViewInventory() {
-  const Producttype = [{ id: 1, value: 'vegie' }, { id: 2, value: 'fruit' }, { id: 3, value: 'addanother type' }]
   const [x, setx] = useState([]);
+  const [Producttype, setProducttype] = useState([]);
   const { User } = useAuthState();
   const [Searchvalue, SetSearchvalue] = useState({
     email: User.email,
@@ -29,11 +29,13 @@ export default function ViewInventory() {
   const [data, setdata] = useState(true);
   const [filtervalue, setfiltervalue] = useState({
     email: User.email,
-    ProductDescription: undefined,
     Producttype: undefined,
-    quantity: undefined,
-    Discount: undefined,
-    Priceperunit: undefined
+    minquantity: undefined,
+    maxquantity: undefined,
+    minDiscount: undefined,
+    maxDiscount: undefined,
+    minPriceperunit: undefined,
+    maxPriceperunit: undefined
   })
 
 
@@ -41,12 +43,14 @@ export default function ViewInventory() {
   useEffect(() => {
     axios.get('http://localhost:5001/items/', { params: { email: filtervalue.email } })
       .then(res => {
-        if (!res.data.length) {
+        console.log(res.data.Producttypefilter)
+        if (!res.data.doc.length) {
           setdata(false)
         }
         else {
           setdata(true)
-          setx(res.data)
+          setx(res.data.doc)
+          setProducttype(res.data.Producttypefilter)
         }
 
       }).catch(error => console.log(error))
@@ -67,55 +71,79 @@ export default function ViewInventory() {
   function HandleFilterSubmit(e) {
     e.preventDefault();
     axios.get('http://localhost:5001/items/filter', { params: { body: filtervalue } }).then(res => {
-      setx(res.data)
+      setx(res.data.doc)
     })
   }
 
   async function handleSearch(e) {
     e.preventDefault();
     await axios.post(`http://localhost:5001/items/search`, Searchvalue).then(res => {
+      console.log(res.data)
       setx(res.data)
       SetSearchvalue(prevvalue=>({...prevvalue,Value:""}))
     })
   }
+  async function HandleSearchReset(e){
+    e.preventDefault();
+    axios.get('http://localhost:5001/items/', { params: { email: filtervalue.email } })
+    .then(res => {
+      console.log(res.data.Producttypefilter)
+      if (!res.data.doc.length) {
+        setdata(false)
+      }
+      else {
+        setdata(true)
+        setx(res.data.doc)
+        setProducttype(res.data.Producttypefilter)
+      }
+
+    }).catch(error => console.log(error))
+
+
+  }
   return (
     <div>
-      <Accordion square={false} >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}
+      <Box sx={{ display: 'block',  bgcolor: 'lightgoldenrodyellow', p: 1 }}>
+       <Box sx={{ alignItems: 'center',display: 'flow', mx: 20, mt: 1, p: 1 }}>
+       <Box component="form" sx={{mx: 20,display:'flex',bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,display:'grid',
+        alignItems: 'center'}}> 
+        <Grid container spacing={2}>
+      <Accordion  square={false} >
+        <AccordionSummary  expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header">Filter</AccordionSummary>
-        <AccordionDetails sx={{ display: 'table' }}>
-          <InputLabel sx={{ textAlign: 'center' }}>Product Description</InputLabel>
-          <Input name="ProductDescription" value={filtervalue.ProductDescription} type="string"
-            onDoubleClick={e => handleFilter(e)}
-          />
-          <br></br>
-          <TextField
+        <AccordionDetails sx={{ display: 'table',alignItems:'center' }}>
+          <TextField 
             onChange={e => { setfiltervalue({ ProductType: [e.target.value] }) }}
             select label="type of product" color='' variant='filled' focused fullWidth multiline>
             {Producttype.map(option => (
-              <MenuItem key={option.id} value={option.value}>
-                {option.value}
+              <MenuItem key={Math.random} value={option}>
+                {option}
               </MenuItem>
             ))}
           </TextField>
-          <InputLabel >quantity</InputLabel>
-          <Input type="number" name="quantity" value={filtervalue.quantity}
+          <InputLabel sx={{  textAlign:'center'}} >quantity</InputLabel>
+          <Input sx={{  textAlign:'center'}} placeholder="minimum" type="number" name="minquantity" value={filtervalue.minquantity}
             onChange={e => handleFilter(e)}
-          //  onChange={e=>setQuantity(e.target.value)}
+          />
+           <Input placeholder="maximum" type="number" name="maxquantity" value={filtervalue.maxquantity}
+            onChange={e => handleFilter(e)}
           />
           <br></br>
-          <InputLabel >Discount</InputLabel>
-          <Input type="number" name="Discount" value={filtervalue.Discount}
+          <InputLabel sx={{  textAlign:'center'}}>Discount</InputLabel>
+          <Input placeholder="minimum" type="number" name="minDiscount" value={filtervalue.minDiscount}
             onChange={e => handleFilter(e)}
-          //  onChange={e=>{
-          //    setDiscount(e.target.value)}} 
+          />
+            <Input placeholder="maximum"  type="number" name="maxDiscount" value={filtervalue.maxDiscount}
+            onChange={e => handleFilter(e)}
           />
           <br></br>
-          <InputLabel >Price per unit</InputLabel>
-          <Input type="number" name="Priceperunit" value={filtervalue.Priceperunit}
+          <InputLabel sx={{  textAlign:'center'}} >Price per unit</InputLabel>
+          <Input placeholder="minimum" type="number" name="minPriceperunit" value={filtervalue.minPriceperunit}
             onChange={e => handleFilter(e)}
-          // onChange={calculate} 
+          />
+            <Input placeholder="maximum"  type="number" name="maxPriceperunit" value={filtervalue.maxPriceperunit}
+            onChange={e => handleFilter(e)}
           />
           <br></br>
           <br></br>
@@ -124,12 +152,21 @@ export default function ViewInventory() {
           </Button>
         </AccordionDetails >
       </Accordion>
-      <Input id="Searchfield" sx={{ ml: 50 }} placeholder="search" type="string" value={Searchvalue.Value} multiline onChange={e => { console.log(e.target.value);  SetSearchvalue(prevstate=>({...prevstate,
+    <br></br>
+
+      
+      <Input sx={{textAlign: 'center'}} id="Searchfield"  placeholder="search" type="string" value={Searchvalue.Value} onChange={e => { console.log(e.target.value);  SetSearchvalue(prevstate=>({...prevstate,
       Value:e.target.value}) ) }}>
       </Input>
-      <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+      <IconButton type="submit" sx={{  }} aria-label="search">
         <SearchIcon onClick={e => { handleSearch(e) }} />
       </IconButton>
+      <Button size="small" color="warning" variant="contained" onClick={e => HandleSearchReset(e)}   >
+            Reset search
+          </Button>
+          </Grid>
+          </Box>
+      </Box>
 
       {data ?
         x.map(({ Date, ProductDescription, Quantity, ProductType, Price, Value, Discount }) => {
@@ -158,7 +195,7 @@ export default function ViewInventory() {
         )
 
         : <h1>no inventory</h1>}
-
+</Box>
     </div>
   )
 }

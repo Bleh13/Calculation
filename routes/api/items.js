@@ -14,8 +14,9 @@ router.get('/useremail',(req, res) => {
 router.get('/', (req, res,) => {
     console.log(req)
     Items.find({Email: req.query.email},(error,docs)=>{
-        
-        res.json(docs)
+        var doc=docs
+        var Producttypefilter= [...new Set(docs.map(value =>  value.ProductType))]
+        res.json({doc,Producttypefilter})
     })})
 
 router.get('/filter', (req, res) => {
