@@ -112,7 +112,7 @@ axios.post('http://localhost:5001/items/newItem',inventory)
  </Box> 
 
 
- <Box component="form" sx={{display:'flex',bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,boxShadow: 10,display:'grid',
+ <Box component="form" sx={{bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,boxShadow: 10,display:'grid',
         alignItems: 'center',borderColor: 'primary.main'}}>   
        <InputLabel sx={{  textAlign:'center',fontSize:20}}>summary</InputLabel> 
       <List sx={{textAlign:'center'}}>

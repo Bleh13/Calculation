@@ -10,28 +10,45 @@ router.get('/useremail',(req, res) => {
     Items.findOne()
     .then(Items => res.json(Items))
 })
-
 router.get('/', (req, res,) => {
     console.log(req)
+  
     Items.find({Email: req.query.email},(error,docs)=>{
         var doc=docs
         var Producttypefilter= [...new Set(docs.map(value =>  value.ProductType))]
-        res.json({doc,Producttypefilter})
+        var ProductQuantity= [...new Set(docs.map(value =>  value.Quantity))]
+        var ProductPrice= [...new Set(docs.map(value =>  value.Price))]
+        var ProductDiscount= [...new Set(docs.map(value =>  value.Discount))]
+        var maxProductQuantity= Math.max(...ProductQuantity)
+        var maxProductPrice= Math.max(...ProductPrice)
+        var maxProductDiscount= Math.max(...ProductDiscount)
+        res.json({doc,Producttypefilter,maxProductQuantity,maxProductPrice,maxProductDiscount})
     })})
-
-router.get('/filter', (req, res) => {
-    var data ={
-        ProductType:undefined,
-        ProductDescription:undefined,
-        Price:undefined,
-        Quantity: undefined,
-        Discount:undefined
+router.put('/filter', (req, res) => {
+    
+    if(!req.body.ProductType){
+    Items.find(
+            {Email:req.body.email,
+          Quantity:{$gte:req.body.minQuantity},Quantity:{$lte:req.body.maxQuantity},
+          Price:{$gte:req.body.minPriceperunit},Price:{$lte:req.body.maxPriceperunit},
+        Discount:{$gte:req.body.minDiscount},Discount:{$lte:req.body.maxDiscount}}
+    ).then(docs=>{
+        console.log(docs)
+        res.json(docs)}) 
+    }else{
+        console.log(req.body)
+        Items.find(
+                {Email:req.body.email,
+                ProductType:req.body.ProductType,
+              Quantity:{$gte:req.body.minQuantity},Quantity:{$lte:req.body.maxQuantity},
+              Price:{$gte:req.body.minPriceperunit},Price:{$lte:req.body.maxPriceperunit},
+            Discount:{$gte:req.body.minDiscount},Discount:{$lte:req.body.maxDiscount}}
+        ).then(docs=>{
+            console.log(docs)
+            res.json(docs)})
     }
-
-
-    console.log(req)
 })
-router.post('/search',(req,res)=>{
+router.put('/search',(req,res)=>{
     console.log(req.body)
     var searchvalue= req.body.Value
     Items.find({Email: req.body.email}).find({$or:[
@@ -70,6 +87,4 @@ router.put('/update/(:id)', (req, res) => {
 
     })
 })
-
-
 module.exports = router;

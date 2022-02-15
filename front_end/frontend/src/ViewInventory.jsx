@@ -21,6 +21,7 @@ import SearchIcon from '@mui/icons-material/Search';
 export default function ViewInventory() {
   const [x, setx] = useState([]);
   const [Producttype, setProducttype] = useState([]);
+  const [DefaultMaxvalues,setDefaultMaxvalues]= useState([]);
   const { User } = useAuthState();
   const [Searchvalue, SetSearchvalue] = useState({
     email: User.email,
@@ -29,17 +30,14 @@ export default function ViewInventory() {
   const [data, setdata] = useState(true);
   const [filtervalue, setfiltervalue] = useState({
     email: User.email,
-    Producttype: undefined,
-    minquantity: undefined,
-    maxquantity: undefined,
-    minDiscount: undefined,
-    maxDiscount: undefined,
-    minPriceperunit: undefined,
-    maxPriceperunit: undefined
+    ProductType: undefined,
+    minQuantity: 0,
+    maxQuantity: DefaultMaxvalues.Quantity,
+    minDiscount: 0,
+    maxDiscount:DefaultMaxvalues.Discount,
+    minPriceperunit: 0,
+    maxPriceperunit: DefaultMaxvalues.Price,
   })
-
-
-
   useEffect(() => {
     axios.get('http://localhost:5001/items/', { params: { email: filtervalue.email } })
       .then(res => {
@@ -51,33 +49,25 @@ export default function ViewInventory() {
           setdata(true)
           setx(res.data.doc)
           setProducttype(res.data.Producttypefilter)
-        }
-
-      }).catch(error => console.log(error))
+          setfiltervalue(prevvalue=>({...prevvalue,maxPriceperunit:res.data.maxProductPrice,
+            maxQuantity:res.data.maxProductQuantity,maxDiscount:res.data.maxProductDiscount}))
+          setDefaultMaxvalues(prevvalue=>({...prevvalue,Price:res.data.maxProductPrice,
+            Quantity:res.data.maxProductQuantity,Discount:res.data.maxProductDiscount
+        }))
+      }}).catch(error => console.log(error))
 
   }
-    , []);
-  async function handleFilter(e) {
-    const { name, value } = e.target;
-    setfiltervalue(previousstate => ({
-      ...previousstate,
-      [name]: value
-    }
-    )
-
-    )
-    console.log(filtervalue)
-  }
-  function HandleFilterSubmit(e) {
+    ,[]);
+  async function HandleFilterSubmit(e) {
     e.preventDefault();
-    axios.get('http://localhost:5001/items/filter', { params: { body: filtervalue } }).then(res => {
-      setx(res.data.doc)
+    await axios.put('http://localhost:5001/items/filter', filtervalue).then(res => {
+      console.log(res.data)
+      setx(res.data)
     })
   }
-
   async function handleSearch(e) {
     e.preventDefault();
-    await axios.post(`http://localhost:5001/items/search`, Searchvalue).then(res => {
+    await axios.put(`http://localhost:5001/items/search`, Searchvalue).then(res => {
       console.log(res.data)
       setx(res.data)
       SetSearchvalue(prevvalue=>({...prevvalue,Value:""}))
@@ -103,67 +93,103 @@ export default function ViewInventory() {
   }
   return (
     <div>
-      <Box sx={{ display: 'block',  bgcolor: 'lightgoldenrodyellow', p: 1 }}>
-       <Box sx={{ alignItems: 'center',display: 'flow', mx: 20, mt: 1, p: 1 }}>
-       <Box component="form" sx={{mx: 20,display:'flex',bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,display:'grid',
+      <Box sx={{ display: 'block',  bgcolor: 'lightgoldenrodyellow', }}>
+       <Box sx={{ alignItems: 'center', p: 1 }}>
+       <Box component="form" sx={{mx:'auto' ,bgcolor:'cornsilk',borderRadius:20, width:1/2, p:2,display:'flow',
         alignItems: 'center'}}> 
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
       <Accordion  square={false} >
         <AccordionSummary  expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header">Filter</AccordionSummary>
-        <AccordionDetails sx={{ display: 'table',alignItems:'center' }}>
+        <AccordionDetails sx={{ alignItems:'center' }}>
           <TextField 
-            onChange={e => { setfiltervalue({ ProductType: [e.target.value] }) }}
+            onChange={e => { setfiltervalue(prevstate=> ({...prevstate, ProductType: e.target.value })); console.log(filtervalue)}}
             select label="type of product" color='' variant='filled' focused fullWidth multiline>
             {Producttype.map(option => (
-              <MenuItem key={Math.random} value={option}>
+              <MenuItem value={option}>
                 {option}
               </MenuItem>
             ))}
           </TextField>
           <InputLabel sx={{  textAlign:'center'}} >quantity</InputLabel>
-          <Input sx={{  textAlign:'center'}} placeholder="minimum" type="number" name="minquantity" value={filtervalue.minquantity}
-            onChange={e => handleFilter(e)}
+          <br></br>
+          <TextField sx={{  mx:.5}}InputLabelProps={{
+            shrink: true,
+          }}
+           label="minimum" type="number" name="minQuantity" value={filtervalue.minQuantity}
+           onChange={e => { if(!e.target.value){ setfiltervalue(prevstate=> ({...prevstate, minQuantity: 0 }))}else{setfiltervalue(prevstate=> ({...prevstate, minQuantity: e.target.value }))}}}
           />
-           <Input placeholder="maximum" type="number" name="maxquantity" value={filtervalue.maxquantity}
-            onChange={e => handleFilter(e)}
+           <TextField  sx={{  mx:.5}} InputLabelProps={{
+            shrink: true,
+          }}
+           label="maximum" type="number" name="maxQuantity" value={filtervalue.maxQuantity}
+           onChange={e => { if(!e.target.value){ setfiltervalue(prevstate=> ({...prevstate, maxQuantity: DefaultMaxvalues.Quantity }))}else{setfiltervalue(prevstate=> ({...prevstate, maxQuantity: e.target.value }))}}}
           />
           <br></br>
           <InputLabel sx={{  textAlign:'center'}}>Discount</InputLabel>
-          <Input placeholder="minimum" type="number" name="minDiscount" value={filtervalue.minDiscount}
-            onChange={e => handleFilter(e)}
+          <br></br>
+          <TextField  sx={{  mx:.5}} InputLabelProps={{
+            shrink: true,
+          }}
+ label="minimum" type="number" name="minDiscount" value={filtervalue.minDiscount}
+ onChange={e => { if(!e.target.value){ setfiltervalue(prevstate=> ({...prevstate, minDiscount: 0 }))}else{setfiltervalue(prevstate=> ({...prevstate, minDiscount: e.target.value }))}}}
           />
-            <Input placeholder="maximum"  type="number" name="maxDiscount" value={filtervalue.maxDiscount}
-            onChange={e => handleFilter(e)}
+             <TextField  sx={{  mx:.5}} InputLabelProps={{
+            shrink: true,
+          }}
+           label="maximum" type="number" name="maxDiscount" value={filtervalue.maxDiscount}
+           onChange={e => { if(!e.target.value){ setfiltervalue(prevstate=> ({...prevstate, maxDiscount: DefaultMaxvalues.Discount}))}else{setfiltervalue(prevstate=> ({...prevstate, maxDiscount: e.target.value }))}}}
           />
           <br></br>
           <InputLabel sx={{  textAlign:'center'}} >Price per unit</InputLabel>
-          <Input placeholder="minimum" type="number" name="minPriceperunit" value={filtervalue.minPriceperunit}
-            onChange={e => handleFilter(e)}
+          <br></br>
+          <TextField  sx={{  mx:.5}} InputLabelProps={{
+            shrink: true,
+          }}
+label="minimum" type="number" name="minPriceperunit" value={filtervalue.minPriceperunit}
+            onChange={e => { if(!e.target.value){ setfiltervalue(prevstate=> ({...prevstate, minPriceperunit: 0 }))}else{setfiltervalue(prevstate=> ({...prevstate, minPriceperunit: e.target.value }))}}}
           />
-            <Input placeholder="maximum"  type="number" name="maxPriceperunit" value={filtervalue.maxPriceperunit}
-            onChange={e => handleFilter(e)}
+            <TextField  sx={{  mx:.5}} InputLabelProps={{
+            shrink: true,
+          }}
+ label="maximum"  type="number" name="maxPriceperunit" value={filtervalue.maxPriceperunit}
+ onChange={e => { if(!e.target.value){ setfiltervalue(prevstate=> ({...prevstate, maxPriceperunit: DefaultMaxvalues.Price }))}else{setfiltervalue(prevstate=> ({...prevstate, maxPriceperunit: e.target.value }))}}}
           />
           <br></br>
           <br></br>
-          <Button variant="contained" onClick={e => HandleFilterSubmit()}   >
+
+          <Grid container spacing={1} >
+          <Grid ms={2} sx={{mx:'auto',}} >
+          <Button sx={{mx:1,}} variant="contained" color='warning' onClick={e => HandleFilterSubmit(e)}   >
             Filter
+          </Button> 
+          <Button  variant="contained" color='warning' onClick={e => HandleSearchReset(e)}   >
+            Clear Filters
           </Button>
+          </Grid>
+          </Grid>
         </AccordionDetails >
+        
       </Accordion>
+     
     <br></br>
 
-      
-      <Input sx={{textAlign: 'center'}} id="Searchfield"  placeholder="search" type="string" value={Searchvalue.Value} onChange={e => { console.log(e.target.value);  SetSearchvalue(prevstate=>({...prevstate,
+    <Grid xs={6}>
+      <Input sx={{}} id="Searchfield"  placeholder="search" type="string" value={Searchvalue.Value} onChange={e => { console.log(e.target.value);  SetSearchvalue(prevstate=>({...prevstate,
       Value:e.target.value}) ) }}>
       </Input>
-      <IconButton type="submit" sx={{  }} aria-label="search">
+      </Grid>
+      <Grid >
+      <IconButton type="submit" aria-label="search">
         <SearchIcon onClick={e => { handleSearch(e) }} />
       </IconButton>
+      </Grid>
+      <Grid ms={2}>
       <Button size="small" color="warning" variant="contained" onClick={e => HandleSearchReset(e)}   >
             Reset search
           </Button>
+          </Grid>
           </Grid>
           </Box>
       </Box>
